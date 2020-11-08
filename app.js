@@ -19,7 +19,7 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 // подключаемся к серверу mongo
-mongoose.connect('mongodb://localhost:27017/news-explorer', {
+mongoose.connect(process.env.NODE_ENV === 'production' ? 'mongodb://localhost:27017/news-explorer' : process.env.JWT_SECRET, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
