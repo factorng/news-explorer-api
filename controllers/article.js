@@ -16,7 +16,7 @@ const createArticle = (req, res, next) => {
     keyword, title, text, date, source, link, image, owner: req.user._id,
   })
     // вернём записанные в базу данные
-    .then((card) => res.status(200).send(card))
+    .then((card) => res.send(card))
     // данные не записались, вернём ошибку
     .catch(next);
 };
@@ -29,8 +29,8 @@ const deleteArticleById = (req, res, next) => {
       if (article.owner._id.toString() !== req.user._id) {
         throw new ForbiddenError('Удалять можно только свои статьи');
       }
-      Article.findByIdAndDelete(req.params.articleId)
-        .then(() => res.status(200).send({ message: 'Статья удалена' }))
+      Article.deleteOne(article)
+        .then(() => res.send({ message: 'Статья удалена' }))
         .catch(next);
     })
     .catch(next);

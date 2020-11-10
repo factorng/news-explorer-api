@@ -14,15 +14,18 @@ const { auth } = require('./middlewares/auth');
 
 // controllers
 const { createUser, login } = require('./controllers/user');
+// error handler
+const { errorHandler } = require('./middlewares/errorHandler');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
 // подключаемся к серверу mongo
-mongoose.connect(process.env.NODE_ENV === 'production' ? 'mongodb://localhost:27017/news-explorer' : process.env.JWT_SECRET, {
+mongoose.connect(process.env.NODE_ENV === 'production' ? process.env.DB : 'mongodb://localhost:27017/news-explorer', {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
+  useUnifiedTopology: true,
 });
 
 app.use(bodyParser.json());
@@ -49,32 +52,8 @@ app.use('/', auth, articleRouter);
 app.use(errorLogger); // подключаем логгер ошибок
 
 app.use(errors()); // обработчик ошибок celebrate
-app.use((err, req, res, next) => {
-  // если у ошибки нет статуса, выставляем 500
-  let { statusCode = 500, message } = err;
-  // eslint-disable-next-line eqeqeq
-  if (err.name == 'MongoError' && err.code == 11000) {
-    statusCode = 409;
-    message = 'Пользователь с таким email уже зарегестрирован';
-  }
-  if (err.name === 'ValidationError') {
-    statusCode = 400;
-    message = 'Ошибка валидации';
-  }
-  if (err.name === 'CastError') {
-    statusCode = 400;
-    message = 'Передан некорректный идентификатор';
-  }
-  res
-    .status(statusCode)
-    .send({
-      // проверяем статус и выставляем сообщение в зависимости от него
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-  next();
-});
+app.use(errorHandler);
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`Example app listening at http://localhost:${PORT}`);
 });
