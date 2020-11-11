@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger.js');
+const NotFoundError = require('./errors/not-found-err');
 
 // router
 const userRouter = require('./routes/user.js');
@@ -48,7 +49,9 @@ app.post('/signin', celebrate({
 
 app.use('/', auth, userRouter);
 app.use('/', auth, articleRouter);
-
+app.all('*', () => {
+  throw new NotFoundError('Запрашиваемый ресурс не найден');
+});
 app.use(errorLogger); // подключаем логгер ошибок
 
 app.use(errors()); // обработчик ошибок celebrate
