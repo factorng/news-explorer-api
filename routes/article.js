@@ -19,7 +19,10 @@ router.post('/articles', celebrate({
     title: Joi.string().required().min(2).max(300),
     text: Joi.string().required().min(2),
     date: Joi.date().required(),
-    source: Joi.object(),
+    source: Joi.object().keys({
+      id: Joi.any(),
+      name: Joi.string().required(),
+    }),
     link: Joi.string().required().regex(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/),
     image: Joi.string().required().regex(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/),
   }),
