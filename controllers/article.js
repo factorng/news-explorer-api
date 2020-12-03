@@ -3,8 +3,9 @@ const NotFoundError = require('../errors/not-found-err');
 const ForbiddenError = require('../errors/forbidden-err');
 
 const getArticles = (req, res, next) => {
-  Article.find({ })
-    .then((article) => res.status(201).send(article))
+  const id = req.user._id;
+  Article.find({ owner: id }).select('+owner').sort({ date: -1 })
+    .then((articles) => res.status(201).send(articles))
     .catch(next);
 };
 
